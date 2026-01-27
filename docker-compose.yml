@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  s3-ftp-server:
+    build: .
+    container_name: s3-ftp-server
+    ports:
+      - "21:21"
+      - "30000-30100:30000-30100"
+      - "3000:3000"
+    environment:
+      # AWS Configuration
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - S3_BUCKET=${S3_BUCKET}
+
+      # FTP Configuration
+      - FTP_PORT=21
+      - FTP_USER=${FTP_USER}
+      - FTP_PASSWORD=${FTP_PASSWORD}
+      - PASV_MIN_PORT=30000
+      - PASV_MAX_PORT=30100
+      - PASV_URL=${PASV_URL:-localhost}
+
+      # Server Configuration
+      - HEALTH_CHECK_PORT=3000
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - ftp-network
+
+networks:
+  ftp-network:
+    driver: bridge

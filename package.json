@@ -1,0 +1,31 @@
+{
+  "name": "s3-ftp-server",
+  "version": "1.0.0",
+  "description": "FTP server using AWS S3 as backend storage",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "docker:build": "docker build -t s3-ftp-server .",
+    "docker:run": "docker run --env-file .env -p 21:21 -p 30000-30100:30000-30100 s3-ftp-server"
+  },
+  "keywords": [
+    "ftp",
+    "s3",
+    "aws",
+    "file-server",
+    "storage"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.699.0",
+    "dotenv": "^16.4.7",
+    "ftp-srv": "^4.6.3",
+    "winston": "^3.17.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
