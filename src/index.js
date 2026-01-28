@@ -16,7 +16,13 @@ const ftpServer = new FtpSrv({
     greeting: ['Welcome to S3 FTP Server', 'Powered by AWS S3'],
     anonymous: false,
     timeout: 30000, // 30 second timeout for connections
-    log: logger // Use our logger for ftp-srv internal logs
+    log: {
+        trace: (msg) => logger.debug ? logger.debug(msg) : console.log(msg),
+        debug: (msg) => logger.debug ? logger.debug(msg) : console.log(msg),
+        info: (msg) => logger.info(msg),
+        warn: (msg) => logger.warn(msg),
+        error: (msg) => logger.error(msg)
+    }
 });
 
 // Authentication handler
@@ -252,10 +258,11 @@ async function start() {
             pasv_url: config.ftp.pasv_url
         });
 
+        const RENDER_PORT = process.env.PORT || config.server.healthCheckPort || 3000;
         // Start health check server
-        healthServer.listen(config.server.healthCheckPort, () => {
+        healthServer.listen(RENDER_PORT, '0.0.0.0', () => {
             logger.info('Health check server started', {
-                port: config.server.healthCheckPort
+                port: RENDER_PORT
             });
         });
 
