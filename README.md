@@ -304,6 +304,16 @@ All standard FTP operations are supported:
 - Verify IAM permissions include `s3:ListBucket`
 - Files are stored with their full path as S3 key
 
+### Socket Not Writable Error
+
+This error typically occurs when a client disconnects during a transfer:
+
+- **Normal behavior**: Client cancels transfer or network interruption
+- **How we handle it**: Error is logged at DEBUG level, not ERROR
+- **When to worry**: If it happens on every connection
+
+For detailed troubleshooting, see **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)**
+
 ## Security Recommendations
 
 1. **Use FTPS**: Enable TLS/SSL for encrypted connections

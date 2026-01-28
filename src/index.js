@@ -14,7 +14,9 @@ const ftpServer = new FtpSrv({
     pasv_min: config.ftp.pasv_min,
     pasv_max: config.ftp.pasv_max,
     greeting: ['Welcome to S3 FTP Server', 'Powered by AWS S3'],
-    anonymous: false
+    anonymous: false,
+    timeout: 30000, // 30 second timeout for connections
+    log: logger // Use our logger for ftp-srv internal logs
 });
 
 // Authentication handler
@@ -87,6 +89,11 @@ function createFtpFileSystem(connection) {
             try {
                 const stream = await s3fs.read(filePath);
 
+                // Add error handler to prevent unhandled errors
+                stream.on('error', (error) => {
+                    logger.error('Read stream error', { path: filePath, error: error.message });
+                });
+
                 if (start > 0) {
                     // Skip to start position if needed
                     let bytesRead = 0;
@@ -126,6 +133,11 @@ function createFtpFileSystem(connection) {
                             callback(error);
                         }
                     }
+                });
+
+                // Add error handler to prevent unhandled errors
+                writeStream.on('error', (error) => {
+                    logger.error('Write stream error', { path: filePath, error: error.message });
                 });
 
                 return writeStream;
@@ -194,11 +206,19 @@ ftpServer.on('error', (error) => {
 });
 
 ftpServer.on('client-error', ({ connection, context, error }) => {
-    logger.error('Client error', {
-        ip: connection.ip,
-        context,
-        error: error.message
-    });
+    // Suppress logging for expected socket errors during client disconnection
+    if (error.message && error.message.includes('Socket not writable')) {
+        logger.debug('Client socket closed during operation', {
+            ip: connection.ip,
+            context
+        });
+    } else {
+        logger.error('Client error', {
+            ip: connection.ip,
+            context,
+            error: error.message
+        });
+    }
 });
 
 // Connection handlers
