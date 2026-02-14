@@ -4,7 +4,9 @@ const { combine, timestamp, printf, colorize } = winston.format;
 
 // Custom log format
 const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
-    let msg = `${timestamp} [${level}]: ${message}`;
+
+
+    let msg = `${timestamp} [${level}]: ${typeof message === 'string' ? message : JSON.stringify(message)}`;
 
     // Add metadata if present
     if (Object.keys(metadata).length > 0) {

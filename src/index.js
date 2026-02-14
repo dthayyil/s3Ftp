@@ -15,7 +15,7 @@ const ftpServer = new FtpSrv({
     pasv_max: config.ftp.pasv_max,
     greeting: ['Welcome to S3 FTP Server', 'Powered by AWS S3'],
     anonymous: false,
-    timeout: 30000, // 30 second timeout for connections
+    timeout: 120000, // 120 second timeout for connections
     log: logger
 });
 
