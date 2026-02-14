@@ -16,13 +16,7 @@ const ftpServer = new FtpSrv({
     greeting: ['Welcome to S3 FTP Server', 'Powered by AWS S3'],
     anonymous: false,
     timeout: 30000, // 30 second timeout for connections
-    log: {
-        trace: (msg) => logger.debug ? logger.debug(msg) : console.log(msg),
-        debug: (msg) => logger.debug ? logger.debug(msg) : console.log(msg),
-        info: (msg) => logger.info(msg),
-        warn: (msg) => logger.warn(msg),
-        error: (msg) => logger.error(msg)
-    }
+    log: logger
 });
 
 // Authentication handler

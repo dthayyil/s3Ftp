@@ -15,7 +15,7 @@ const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
 });
 
 // Create logger instance
-export const logger = winston.createLogger({
+const winstonLogger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -46,4 +46,10 @@ export const logger = winston.createLogger({
     ]
 });
 
+// Add child method for compatibility with ftp-srv (pino/bunyan-style logging)
+winstonLogger.child = function() {
+    return this;
+};
+
+export const logger = winstonLogger;
 export default logger;
