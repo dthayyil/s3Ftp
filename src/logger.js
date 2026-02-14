@@ -14,8 +14,27 @@ const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
     return msg;
 });
 
+// Custom log levels (add trace for compatibility with ftp-srv)
+const customLevels = {
+    levels: {
+        trace: 0,
+        debug: 1,
+        info: 2,
+        warn: 3,
+        error: 4
+    },
+    colors: {
+        trace: 'gray',
+        debug: 'cyan',
+        info: 'green',
+        warn: 'yellow',
+        error: 'red'
+    }
+};
+
 // Create logger instance
 const winstonLogger = winston.createLogger({
+    levels: customLevels.levels,
     level: process.env.LOG_LEVEL || 'info',
     format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -25,7 +44,7 @@ const winstonLogger = winston.createLogger({
         // Console output
         new winston.transports.Console({
             format: combine(
-                colorize(),
+                colorize({ colors: customLevels.colors }),
                 timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
                 logFormat
             )
@@ -45,6 +64,9 @@ const winstonLogger = winston.createLogger({
         })
     ]
 });
+
+// Add custom colors to Winston
+winston.addColors(customLevels.colors);
 
 // Add child method for compatibility with ftp-srv (pino/bunyan-style logging)
 winstonLogger.child = function() {
