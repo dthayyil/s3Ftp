@@ -15,7 +15,7 @@ const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
 });
 
 // Create logger instance
-export const logger = winston.createLogger({
+const winstonLogger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -45,5 +45,39 @@ export const logger = winston.createLogger({
         })
     ]
 });
+
+// Create a wrapper to match ftp-srv logger interface
+class FtpLogger {
+    constructor(baseLogger, metadata = {}) {
+        this.baseLogger = baseLogger;
+        this.metadata = metadata;
+    }
+
+    trace(msg, meta = {}) {
+        return this.baseLogger.debug(msg, { ...this.metadata, ...meta });
+    }
+
+    debug(msg, meta = {}) {
+        return this.baseLogger.debug(msg, { ...this.metadata, ...meta });
+    }
+
+    info(msg, meta = {}) {
+        return this.baseLogger.info(msg, { ...this.metadata, ...meta });
+    }
+
+    warn(msg, meta = {}) {
+        return this.baseLogger.warn(msg, { ...this.metadata, ...meta });
+    }
+
+    error(msg, meta = {}) {
+        return this.baseLogger.error(msg, { ...this.metadata, ...meta });
+    }
+
+    child(metadata = {}) {
+        return new FtpLogger(this.baseLogger, { ...this.metadata, ...metadata });
+    }
+}
+
+export const logger = new FtpLogger(winstonLogger);
 
 export default logger;
